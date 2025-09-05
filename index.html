@@ -4,9 +4,21 @@
   <meta charset="utf-8">
   <title>正在跳转...</title>
   <style>
-    body{margin:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#000;color:#0ff;font-family:Arial;}
-    .msg{font-size:20px;animation:blink 1s infinite;}
-    @keyframes blink{50%{opacity:0;}}
+    body {
+      margin:0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      background:#000;
+      color:#0ff;
+      font-family:Arial;
+    }
+    .msg {
+      font-size:20px;
+      animation:blink 1s infinite;
+    }
+    @keyframes blink { 50% { opacity:0; } }
   </style>
 </head>
 <body>
@@ -19,14 +31,31 @@
     let target=getParam("target");
     if(target){
       try{
-        let real=atob(target); // base64解码
-        // 微信/QQ 内置浏览器用内嵌 iframe 打开
-        if(/MicroMessenger|QQ\//i.test(navigator.userAgent)){
-          document.body.innerHTML="<iframe src='"+real+"' style='border:0;width:100%;height:100%'></iframe>";
-        }else{
-          location.replace(real); // 其他直接跳转
+        let real = "";
+        try {
+          // 先尝试 base64 解码
+          real = atob(target);
+        } catch(e) {
+          // 如果 base64 解码失败，尝试原始值
+          real = target;
         }
-      }catch(e){document.body.innerHTML="链接无效";}
+        if(!real.startsWith("http")){
+          // 如果不是网址，尝试 url 解码
+          try { real = decodeURIComponent(target); } catch(e){}
+        }
+        if(real && real.startsWith("http")){
+          // 微信/QQ 内置浏览器用内嵌 iframe 打开
+          if(/MicroMessenger|QQ\//i.test(navigator.userAgent)){
+            document.body.innerHTML="<iframe src='"+real+"' style='border:0;width:100%;height:100%'></iframe>";
+          }else{
+            location.replace(real); // 其他直接跳转
+          }
+        }else{
+          document.body.innerHTML="链接无效";
+        }
+      }catch(e){
+        document.body.innerHTML="解码失败";
+      }
     }else{
       document.body.innerHTML="缺少参数";
     }
