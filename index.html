@@ -1,64 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>正在跳转...</title>
-  <style>
-    body {
-      margin:0;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      background:#000;
-      color:#0ff;
-      font-family:Arial;
-    }
-    .msg {
-      font-size:20px;
-      animation:blink 1s infinite;
-    }
-    @keyframes blink { 50% { opacity:0; } }
-  </style>
-</head>
-<body>
-  <div class="msg">正在安全跳转，请稍候...</div>
-  <script>
-    function getParam(name){
-      let url=new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
-    let target=getParam("target");
-    if(target){
-      try{
-        let real = "";
-        try {
-          // 先尝试 base64 解码
-          real = atob(target);
-        } catch(e) {
-          // 如果 base64 解码失败，尝试原始值
-          real = target;
-        }
-        if(!real.startsWith("http")){
-          // 如果不是网址，尝试 url 解码
-          try { real = decodeURIComponent(target); } catch(e){}
-        }
-        if(real && real.startsWith("http")){
-          // 微信/QQ 内置浏览器用内嵌 iframe 打开
-          if(/MicroMessenger|QQ\//i.test(navigator.userAgent)){
-            document.body.innerHTML="<iframe src='"+real+"' style='border:0;width:100%;height:100%'></iframe>";
-          }else{
-            location.replace(real); // 其他直接跳转
-          }
-        }else{
-          document.body.innerHTML="链接无效";
-        }
-      }catch(e){
-        document.body.innerHTML="解码失败";
-      }
-    }else{
-      document.body.innerHTML="缺少参数";
-    }
-  </script>
-</body>
-</html>
+<!doctype html><meta charset="utf-8"><title>跳转中…</title>
+<script>
+(function(){
+  function q(n){const m=location.search.match(new RegExp('(?:[?&])'+n+'=([^&]*)'));return m?decodeURIComponent(m[1].replace(/\+/g,'%20')):''}
+  function b64url(s){if(!s)return s; s=s.replace(/-/g,'+').replace(/_/g,'/'); const p=s.length%4; if(p) s+='='.repeat(4-p); try{return atob(s)}catch(e){return s}}
+  var uid = q('uid') || b64url(q('token')) || '';
+  if(!uid){document.write('链接已过期');return;}
+  // ⚠️ 把下面域名改成你的主站域名
+  var main = 'https://zan88.vip/go.php?uid=' + encodeURIComponent(uid);
+  location.replace(main);
+})();
+</script>
